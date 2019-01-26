@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sts.springboot</groupId>
+  <artifactId>course-api</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>STS course API</name>
+  
+  <!-- 
+  link refer for spring boot maven installation:
+  https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-installing-spring-boot.html
+  
+  reference link 2: https://projects.spring.io/spring-boot/
+  
+  Spring Boot is compatible with Apache Maven 3.2 or above
+  
+  Spring Boot dependencies use the org.springframework.boot groupId. 
+  Typically, your Maven POM file inherits from the spring-boot-starter-parent project and declares dependencies to one or more “Starters”. 
+ Boot also provides an optional Maven plugin to create executable jars.
+ 
+ The spring-boot-starter-parent is a great way to use Spring Boot, but it might not be suitable 
+ all of the time. 
+ Sometimes you may need to inherit from a different parent POM, 
+ or you might not like our default settings. 
+ In those cases, see Section 13.2.2, “Using Spring Boot without the Parent POM” : https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent
+ , for an alternative solution that uses an import scope.
+ 
+ We are now using the alternate solution as below in this pom.xml maven config
+ -->
+ 
+ <!-- Inherit defaults from Spring Boot parent . doing below, we are asking the current project a child of spring boot configured project-->
+
+ <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.0.RELEASE</version>
+</parent>
+
+
+<!--  declare the dependencies -->
+ <!-- In this example, instead of mentioning all the dependencies, we'd refer a dependency to an artifact that holds the dependencies we need. Hence, just on eartifact mentioned below:
+ which is the spring-boot-started-web which holds all dependencies for web related spring applications -->
+ 
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+</dependencies>
+
+<!-- <dependencies> tells us what jars to download, while <parent> tells us whats version of them -->
+<!-- to specify that we require the java version as 1.8 -->
+<properties>
+	<java.version>1.8</java.version>
+</properties>
+ 
+</project>

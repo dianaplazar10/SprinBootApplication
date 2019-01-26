@@ -1,0 +1,292 @@
+steps:
+1) create a "maven project" using the below pom.xml
+
+------------------------------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sts.springboot</groupId>
+  <artifactId>course-api</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>STS course API</name>
+  
+  <!-- 
+  link refer for spring boot maven installation:
+  https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-installing-spring-boot.html
+  
+  reference link 2: https://projects.spring.io/spring-boot/
+  
+  Spring Boot is compatible with Apache Maven 3.2 or above
+  
+  Spring Boot dependencies use the org.springframework.boot groupId. 
+  Typically, your Maven POM file inherits from the spring-boot-starter-parent project and declares dependencies to one or more “Starters”. 
+ Boot also provides an optional Maven plugin to create executable jars.
+ 
+ The spring-boot-starter-parent is a great way to use Spring Boot, but it might not be suitable 
+ all of the time. 
+ Sometimes you may need to inherit from a different parent POM, 
+ or you might not like our default settings. 
+ In those cases, see Section 13.2.2, “Using Spring Boot without the Parent POM” : https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent
+ , for an alternative solution that uses an import scope.
+ 
+ We are now using the alternate solution as below in this pom.xml maven config
+ -->
+ 
+ <!-- Inherit defaults from Spring Boot parent . doing below, we are asking the current project a child of spring boot configured project-->
+
+ <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.0.RELEASE</version>
+</parent>
+
+
+<!--  declare the dependencies -->
+ <!-- In this example, instead of mentioning all the dependencies, we'd refer a dependency to an artifact that holds the dependencies we need. Hence, just on eartifact mentioned below:
+ which is the spring-boot-started-web which holds all dependencies for web related spring applications -->
+ 
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+
+<!-- <dependencies> tells us what jars to download, while <parent> tells us whats version of them -->
+<!-- to specify that we require the java version as 1.8 -->
+<properties>
+	<java.version>1.8</java.version>
+</properties>
+ 
+</project>
+------------------------------
+
+2) tell spring to indicate that this is a spring application.
+	- This is done by annotating the Main class with @SpringBootApplication annotation.
+	- Hence, annotate the main class(SpringBootExampleMain) with @SpringBootApplication
+
+3) We now need to tell SpringBoot to start the application from the annotated main class,
+   and host it in a servlet container. In Spring Boot, its the Embedded Tomcat server 
+   that is internally installed and embedded as a convenience, 
+   so that there is no need to download and set up the server ourselves.
+   Below is the line of code that does all this for us in a single line
+    - SpringApplication.run(<<MainClassName>>.class,args);
+    where args is the variable that is passed to the method.
+    
+Thats it!. 
+    
+4) Now, run the application as a 'Java application. 
+	- Look into the console for details of server startup and port , etc.
+	- SpringBoot manages installing the Tomcat server and starting it all up without needing any 
+	  configuration from us.
+
+5)access the application in the browser.
+	- http://localhost:8080/
+	- Notice that this gives a WhiteLabel Error Page". This is because no pages or response 
+	  has been configured for default request sat this time.
+	
+
+
+The way it works with SpringBoot is 
+-----------------------------------
+to annotate the custom classes based on its functionalities as one of the below annotations:
+@Service
+@RestController
+, etc
+
+
+In this example, we are builder REST api, hence, the controller here would be a REST controller, hence, the annotation,
+@RestController:
+---------------
+- Its a java class marked with @RestController annotation
+- it has information about the URL
+- it has information about the method that needs to run when accessed.
+
+This class gives the functionality of a call to the url mentioned in the annotation generation.
+
+
+
+HelloController
+-------------- 
+- Its the controller class created for this application, 
+which returns "Hello" when the url localhost:8080/Hello is accessed, 
+instead of returning the WhiteLabel Error page,as it did previously
+
+Steps:
+1)Create a class, HelloController, which is annotated as a REST controller as below:
+
+	@RestController
+	public class HelloController {
+	....
+
+2)Now add a method sayHi() to this class, which is annotated with the url information as below:
+
+	@RequestMapping("/hello")
+	public String sayHi(){
+		return "Hi";
+	}
+
+	- the REquestMapping annotation is defaulted for HTTP GET requests, while, other type of requests needs to be specified explicitly.
+	- the url, "/hello" is accessed as "localhost:8080/hello"
+	
+Note:
+----
+Both the annotations used above are Spring MVC annotations:
+@RestController
+@RequestMapping("/hello")
+
+MOST IMPORTANT advantage of using Spring MVC for REST APIs implementation:
+--------------------------------------------
+ 
+-if you look into the method getTopics in the TopicController class, we see that the response doesn't have to converted to json, 
+which is internally taken care of by the Spring MVC itself.
+
+hence, the method is simplified by just returning a List is the Topics alone as below:
+
+	@RequestMapping("/topics")
+	private List<Topic> getTopics(){
+		return Arrays.asList(
+				new Topic("1","one","one desc"),
+				new Topic("2","one","one desc"),
+				new Topic("3","one","one desc"));
+	}
+----------------------------------------------------------------------------------
+
+@Service
+--------
+	- A class which acts as a databaseUtil for a model, could be annotated as @Service.
+	- This class is a singleton and hence has a single instance. 
+	- However, we need to add this service variable in the Controller class to access its services(get list, add new to list, etc methods)
+	- 2 steps to add the service class to a controller class are:
+		1) Add a private variable of the service class in the Controller.
+		2) Annotate the Service variable as @Autowired, to perform dependency injection, done by Spring MVC
+		3) Update the Service class with annotation @Service, to indicate to Spring that this is a service class that is expected to be singleton.
+		
+		
+
+Now, we could segregate the service class with all the operations of the Topic Models. Hence, we could modify getTopics() as below , in the Controller class.
+
+
+
+Controller Class-
+    --------
+
+@RestController
+public class TopicsController {
+
+@Autowired
+private TopicService topicService;
+
+@RequestMapping("/topics")
+	private List<Topic> getTopics(){
+		return topicService.getTopics();
+	}
+
+}
+
+
+Service Class - 
+   -------
+
+
+@Service
+public class TopicService{
+
+		private List<Topic> topics = new ArrayList<>(Arrays.asList(new Topic("1","one","one desc"),
+						new Topic("2","one","one desc"),
+						new Topic("3","one","one desc"));  // --------(a)
+						
+		private List<Topic> getTopics(){
+		return topics;
+		}
+}
+
+
+Note:
+-----
+Note that, Arrays.asList returns an immutable List which cannot be modified, Hence, it needs to be created using ArrayList as in (a) above.
+--------------------------------------------------------------------------------------------------------------------------------
+
+Implementing REST APIs for the below scenarios:
+---------------------------------------------
+
+1)	GET - All topics
+2)	GET - Topic based on topic id passed in the url
+3)	POST - Add a new Topic
+4)  PUT - Update an existing Topic, given the Topic Id
+5)  DELETE - Remove an existing Topic, given the Topic Id
+
+All the above done in classes TopicService.java and TopicController.java
+
+SpringBoot internally auto-converts all responses to required json based on the definition of annotation as below example:
+-------------------------
+//	2)	GET - All a Topic based on Id passed	
+	@RequestMapping("/topics/{id}")
+	private Topic getTopicById(@PathVariable String id){		
+		return topicService.getTopicById(id);
+	}
+-------------------------
+@ResponseBody - annotation used with @RequestionMapping to accept request object
+@PathVariable - annotation used with @RequestionMapping to accept path param from request
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+Other ways of getting started and creating Spring Boot:
+-------------------------------------------------------
+1)Spring initializr -  Online creation and download of basic spring project from start.spring.io
+2)Spring Boot CLI - Its a command line tool to implement first Spring boot application
+3)STS(Spring Tool Suite) - Download the eclipse ide customized for Spring based applications. When we create a project with this IDE, it internally creates a SpringBootApplication, downloads and extracts it.
+
+--------------------------------------------------------------------------------------------------------------------------------
+application.propertes :
+-------------------------
+We could do any server port configurations using a properties file.
+1)Create an application.properties file under src/main/java/resources folder
+2)include the below line to code, so that spring defaults the port 8081, on start-up
+server.port=8081
+
+here are a list of other properties that can be used:
+https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+SpringBootApplication with JPA- we now work on actual databases
+----------------------------------------------------------------
+
+
+To include JPA functionality to our application, We o the below steps:
+
+1)
+we only add another dependency in the pom file:
+-------------------------
+	<dependency>
+   		<groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+------------------------
+Now rt.click and update the project with new jars  by navigating to rt.click on project >>maven>>updateProject
+
+2)
+Include the @Entity annoattion on the model class to indicate that this is a Table record
+
+3)
+Include @Id annotation above the model's private key.
+
+4)
+
+Embedded Database-(using Apache Derby)
+-----------------
+Similarly,
+We could have the embedded Apache derby installed within the classpath of the project, by just adding another dependency(below) to the project in pom.xml
+
+	<dependency>
+   		<groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    
+CRUDRepoitory interface:
+-----------------------
+We could simply use a custom repository class for a model to implement the CRUDrepository interface.
+This helps in getting all the default 

@@ -1,0 +1,35 @@
+package org.springboot;
+@RestController
+public class SampleController{
+
+    @Autowired
+    SampleService sampleService;
+    //Implement GET with url /test/{id}
+    @GetMapping("/test/{id}")
+    public SampleGetResponse get(@PathVariable String id , HttpServletRequest httpServletRequest, HttpServletResponse response){
+        SampleGetResponse sampleGetResponse = sampleService.getData(id);
+      return sampleGetResponse;
+
+    }
+
+    //Implement POST with url /test, returns 204 when successful. Assume JSON is automatically serialized into object SamplePostRequest by Spring Framework
+  @PostMapping("/test")
+    public void post(@RequestBody SamplePostRequest samplePostRequest, HttpServletRequest httpServletRequest, HttpServletResponse response){
+      try{
+       SamplePostRequest res = sampleService.savePostData(samplePostRequest);
+       response.setResponseStatus(204);
+      }catch(IllegalArgumentException ex){
+        response.setResponseStatus(400);
+      }
+    }
+
+
+@Service
+public class SampleService{
+    public SampleGetResponse getData(String id){
+    }
+      //; //Gets data from DB with String iD, throws IllegalArgumentException if id is not found
+
+    public SamplePostResponse savePostData(SamplePostRequest samplePostRequest); //Saves data to DB with String ID, throws IllegalArgumentException if id is not found
+
+}
